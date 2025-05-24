@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chatbot_backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8001:8001"
+    command: python manage.py runserver 0.0.0.0:8000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chatbot_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # 避免 host node_modules 汙染 container
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # 為了讓 hot reload 在 Docker 裡正常
+    command: npm start
