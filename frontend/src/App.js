@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
+import ChatBot from './components/ChatBot';
 import './index.css';
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
     
     if (token && userData) {
       try {
-        console.log('Verifying token with:', `${API_BASE_URL}/verify-token/`); // 調試用
+        console.log('Verifying token with:', `${API_BASE_URL}/verify-token/`);
         
         const response = await fetch(`${API_BASE_URL}/verify-token/`, {
           headers: {
@@ -73,8 +74,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="text-lg">載入中...</div>
+      <div className="min-h-screen flex justify-center items-center bg-gray-100">
+        <div className="text-lg text-gray-600">載入中...</div>
       </div>
     );
   }
@@ -84,20 +85,26 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
+    <div className="h-screen flex flex-col bg-gray-100">
+      {/* 頂部導航欄 */}
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              聊天機器人
-            </h1>
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-3">
+                AI
+              </div>
+              <h1 className="text-xl font-semibold text-gray-900">
+                AI 聊天助手
+              </h1>
+            </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">
+              <span className="text-gray-700 text-sm">
                 歡迎, {user?.username}
               </span>
               <button 
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors"
               >
                 登出
               </button>
@@ -106,12 +113,9 @@ function App() {
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <p className="text-gray-500">這裡放你現有的聊天介面</p>
-          </div>
-        </div>
+      {/* 聊天區域 */}
+      <main className="flex-1 overflow-hidden">
+        <ChatBot />
       </main>
     </div>
   );
