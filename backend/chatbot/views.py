@@ -5,8 +5,48 @@ from chatbot.models import ChatHistory
 from services.ollama import query_ollama
 from .serializers import ChatInputSerializer
 import logging
+from rest_framework.authtoken.models import Token
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth import authenticate
+from .serializers import LoginSerializer, UserSerializer
 
 logger = logging.getLogger(__name__)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_view(request):
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user': UserSerializer(user).data,
+            'message': '登入成功'
+        })
+    return Response({
+        'error': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    try:
+        request.user.auth_token.delete()
+        return Response({'message': '登出成功'})
+    except Exception as e:
+        return Response({'error': '登出失敗'}, 
+                      status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def verify_token(request):
+    return Response({
+        'user': UserSerializer(request.user).data,
+        'message': 'Token 有效'
+    })
 
 class ChatbotView(APIView):
     def post(self, request):

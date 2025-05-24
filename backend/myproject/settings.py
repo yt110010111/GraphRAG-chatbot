@@ -26,8 +26,13 @@ SECRET_KEY = "django-insecure-qp=_feki=0!jg1k44#=gkn6gg(d#j1o@e*cie-z==y^ddr#ykt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1', 
+    '0.0.0.0',
+    'backend',  # Docker 容器名稱
+]
+CORS_ALLOWED_ORIGINS = True
 # settings.py
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -45,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'rest_framework.authtoken',
     'corsheaders',
     'chatbot'
 ]
@@ -60,7 +66,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 ROOT_URLCONF = "myproject.urls"
 
 TEMPLATES = [
