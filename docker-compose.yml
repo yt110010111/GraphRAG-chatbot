@@ -8,10 +8,13 @@ services:
     container_name: chatbot_backend
     volumes:
       - ./backend:/app
+      - ollama_data:/root/.ollama  # 持久化 Ollama 模型數據
     ports:
-      - "8001:8001"
-    command: python manage.py runserver 0.0.0.0:8001
-    
+      - "8001:8001"    # Django API
+      - "11435:11434"  # Ollama API
+    environment:
+      - OLLAMA_API_URL=http://localhost:11434/api/generate
+    # 移除原來的 command，使用 Dockerfile 中的 CMD
 
   frontend:
     build:
@@ -25,4 +28,9 @@ services:
       - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true  # 為了讓 hot reload 在 Docker 裡正常
+      - REACT_APP_API_URL=http://localhost:8001/api
     command: npm start
+
+# 添加 volume 來持久化 Ollama 數據
+volumes:
+  ollama_data:
