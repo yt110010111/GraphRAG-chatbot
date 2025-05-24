@@ -1,11 +1,14 @@
 .
 ├── backend
 │   ├── chatbot
+│   │   ├── __init__.py
 │   │   ├── models.py
+│   │   ├── serializers.py
 │   │   ├── urls.py
 │   │   └── views.py
 │   ├── db.sqlite3
 │   ├── Dockerfile
+│   ├── __init__.py
 │   ├── manage.py
 │   ├── myproject
 │   │   ├── asgi.py
@@ -13,9 +16,9 @@
 │   │   ├── settings.py
 │   │   ├── urls.py
 │   │   └── wsgi.py
-│   ├── project
 │   ├── requirements.txt
 │   └── services
+│       ├── __init__.py
 │       └── ollama.py
 ├── docker-compose.yml
 ├── frontend
@@ -39,4 +42,4 @@
 ├── README.md
 └── structure.txt
 
-9 directories, 31 files
+8 directories, 35 files

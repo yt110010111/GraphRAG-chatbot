@@ -44,7 +44,7 @@ const ChatApp = () => {
     setMessages([...messages, userMessage]);
     setInputText('');
     setIsTyping(true);
-    
+    /*
     // 模擬AI回應
     setTimeout(() => {
       const botReply = {
@@ -56,7 +56,32 @@ const ChatApp = () => {
       
       setMessages(prevMessages => [...prevMessages, botReply]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000); // 隨機延遲模擬思考時間
+    }, 1000 + Math.random() * 2000); // 隨機延遲模擬思考時間*/
+    // 把原本的 setTimeout 替換成這段：
+fetch('http://localhost:8001/api', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ message: inputText }),
+})
+  .then((res) => res.json())
+  .then((data) => {
+    const botReply = {
+      id: messages.length + 2,
+      text: data.reply, // 後端回傳的文字
+      sender: 'bot',
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, botReply]);
+    setIsTyping(false);
+  })
+  .catch((err) => {
+    console.error('API error:', err);
+    setIsTyping(false);
+  });
+
   };
 
   // 簡單的回應生成邏輯
