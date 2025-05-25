@@ -1,6 +1,17 @@
 version: '3.9'
 
 services:
+  neo4j:
+    image: neo4j:5.9
+    container_name: neo4j_container
+    environment:
+      - NEO4J_AUTH=neo4j/password  # 預設帳密 neo4j / password，建議改成自己的
+    ports:
+      - "7687:7687"   # bolt 協議預設 port
+      - "7474:7474"   # web UI 預設 port
+    volumes:
+      - neo4j_data:/data
+
   backend:
     build:
       context: ./backend
@@ -8,13 +19,17 @@ services:
     container_name: chatbot_backend
     volumes:
       - ./backend:/app
-      - ollama_data:/root/.ollama  # 持久化 Ollama 模型數據
+      - ollama_data:/root/.ollama
     ports:
-      - "8001:8001"    # Django API
-      - "11435:11434"  # Ollama API
+      - "8001:8001"
+      - "11435:11434"
     environment:
       - OLLAMA_API_URL=http://localhost:11434/api/generate
-    # 移除原來的 command，使用 Dockerfile 中的 CMD
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password
+    depends_on:
+      - neo4j
 
   frontend:
     build:
@@ -23,14 +38,14 @@ services:
     container_name: chatbot_frontend
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # 避免 host node_modules 汙染 container
+      - /app/node_modules
     ports:
       - "3000:3000"
     environment:
-      - CHOKIDAR_USEPOLLING=true  # 為了讓 hot reload 在 Docker 裡正常
+      - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_URL=http://127.0.0.1:8001/api
     command: npm start
 
-# 添加 volume 來持久化 Ollama 數據
 volumes:
   ollama_data:
+  neo4j_data:

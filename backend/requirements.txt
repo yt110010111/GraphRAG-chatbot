@@ -3,3 +3,4 @@ djangorestframework>=3.14
 requests>=2.31
 django-cors-headers
 djangorestframework
+neo4j

@@ -6,12 +6,13 @@ from services.ollama import query_ollama
 from .serializers import ChatInputSerializer
 import logging
 from rest_framework.authtoken.models import Token
+from services.neo4j_client import neo4j_client
 
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
-from .serializers import LoginSerializer, UserSerializer
+from .serializers import LoginSerializer, UserSerializer,GraphInputSerializer
 
 logger = logging.getLogger(__name__)
 @api_view(['POST'])
@@ -58,18 +59,19 @@ class ChatbotView(APIView):
             user_input = serializer.validated_data['prompt']
             logger.info(f"Received user input: {user_input}")
 
-            # 1. 從 GraphRAG 抽取上下文 (暫時註解掉)
-            # context = retrieve_context(user_input)
-            
-            # 2. 建立完整的 prompt (暫時不使用 context)
-            full_prompt = f"User: {user_input}\nAssistant:"
-            
+            # 1. 從 GraphRAG (Neo4j) 抽取上下文
+            context = neo4j_client.query_graph_context(user_input)
+            logger.info(f"Retrieved context: {context}")
+
+            # 2. 建立完整的 prompt，帶入上下文
+            full_prompt = f"相關資料:\n{context}\n\nUser: {user_input}\nAssistant:,用zh-tw回覆，你現在是玉山chatbot"
+
             # 3. 呼叫 Ollama
             logger.info("Calling Ollama...")
             response_text = query_ollama(full_prompt)
             logger.info(f"Ollama response: {response_text[:100]}...")  # 只顯示前100字元
 
-            # 4. 儲存對話紀錄 (確保資料庫表格已建立)
+            # 4. 儲存對話紀錄
             try:
                 ChatHistory.objects.create(
                     user_input=user_input,
@@ -89,3 +91,19 @@ class ChatbotView(APIView):
                 "error": "Internal server error",
                 "message": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class CreateGraphView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = GraphInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        text = serializer.validated_data['text']
+
+        try:
+            result = neo4j_client.create_knowledge_graph(text)
+            return Response({"message": result}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"建立知識圖譜失敗: {e}")
+            return Response({"error": "建立知識圖譜失敗", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

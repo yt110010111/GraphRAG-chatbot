@@ -22,9 +22,11 @@
 │   ├── requirements.txt
 │   ├── services
 │   │   ├── __init__.py
+│   │   ├── neo4j_client.py
 │   │   └── ollama.py
 │   └── start.sh
 ├── docker-compose.yml
+├── FAQ.py
 ├── frontend
 │   ├── Dockerfile
 │   ├── package.json
@@ -40,7 +42,7 @@
 │   ├── src
 │   │   ├── App.js
 │   │   ├── components
-│   │   │   ├── AdminGraph
+│   │   │   ├── AdminGraph.js
 │   │   │   ├── ChatBot.js
 │   │   │   └── Login.js
 │   │   ├── index.css
@@ -50,4 +52,4 @@
 ├── README.md
 └── structure.txt
 
-10 directories, 41 files
+10 directories, 43 files
