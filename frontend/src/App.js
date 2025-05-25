@@ -97,7 +97,7 @@ function App() {
                 AI
               </div>
               <h1 className="text-xl font-semibold text-gray-900">
-                AI 聊天助手
+                AI ChatBot
               </h1>
             </div>
             <div className="flex items-center space-x-4">

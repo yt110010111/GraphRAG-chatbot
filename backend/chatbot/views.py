@@ -64,11 +64,11 @@ class ChatbotView(APIView):
             logger.info(f"Retrieved context: {context}")
 
             # 2. 建立完整的 prompt，帶入上下文
-            full_prompt = f"相關資料:\n{context}\n\nUser: {user_input}\nAssistant:,用zh-tw回覆，你現在是玉山chatbot"
+            full_prompt = f"用zh-tw，也就是繁體中文回覆。而你現在是玉山的chatbot(不用講出來)，只要所有跟客服相關的都是以玉山銀行的角度處理，並且要確實的提供相關資料。相關資料:\n{context}\n\這是使用者的問題，請用相關資料中的內容回答: {user_input}\n"
 
             # 3. 呼叫 Ollama
             logger.info("Calling Ollama...")
-            response_text = query_ollama(full_prompt)
+            response_text = "您好，我是玉山chatbot。"+query_ollama(full_prompt)
             logger.info(f"Ollama response: {response_text[:100]}...")  # 只顯示前100字元
 
             # 4. 儲存對話紀錄
