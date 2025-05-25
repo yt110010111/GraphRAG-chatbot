@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import ChatBot from './components/ChatBot';
 import './index.css';
+import AdminGraph from './components/AdminGraph';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -115,8 +117,12 @@ function App() {
       
       {/* 聊天區域 */}
       <main className="flex-1 overflow-hidden">
+      {user?.is_staff ? (
+        <AdminGraph token={localStorage.getItem('token')} />
+        ) : (
         <ChatBot />
-      </main>
+      )}
+</main>
     </div>
   );
 }
